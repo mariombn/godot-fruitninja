@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=1]
+[gd_scene load_steps=9 format=1]
 
 [ext_resource path="res://scripts/Game.gd" type="Script" id=1]
 [ext_resource path="res://assets/bgfruitninja.jpg" type="Texture" id=2]
@@ -6,6 +6,48 @@
 [ext_resource path="res://assets/hud_vidas.png" type="Texture" id=4]
 [ext_resource path="res://assets/font150.fnt" type="BitmapFont" id=5]
 [ext_resource path="res://assets/bomb100.png" type="Texture" id=6]
+
+[sub_resource type="GDScript" id=1]
+
+script/source = "extends Control
+
+var pode = false
+
+
+func _ready():
+	set_process_input(true)
+
+func _input(event):
+	if event.type == InputEvent.SCREEN_TOUCH and pode:
+		get_tree().reload_current_scene()
+	
+
+func start():
+	show()
+	get_node(\"AnimationPlayer\").play(\"gameover\")
+	get_node(\"Timer\").start()
+
+func _on_Timer_timeout():
+	get_node(\"Label 2\").show()
+	pode = true
+"
+
+[sub_resource type="Animation" id=2]
+
+resource/name = "gameover"
+length = 0.7
+loop = false
+step = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("Label:visibility/opacity")
+tracks/0/interp = 1
+tracks/0/imported = false
+tracks/0/keys = {
+"times": FloatArray( 0, 0.7 ),
+"transitions": FloatArray( 1, 1 ),
+"update": 0,
+"values": [ 0.0, 1.0 ]
+}
 
 [node name="Game" type="Node2D"]
 
@@ -48,6 +90,7 @@ autostart = false
 
 [node name="Control" type="Control" parent="."]
 
+editor/display_folded = true
 focus/ignore_mouse = false
 focus/stop_mouse = true
 size_flags/horizontal = 2
@@ -127,10 +170,81 @@ margin/bottom = 118.0
 texture = ExtResource( 6 )
 stretch_mode = 0
 
+[node name="GameOverScreen" type="Control" parent="."]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 40.0
+margin/bottom = 40.0
+script/script = SubResource( 1 )
+
+[node name="Label" type="Label" parent="GameOverScreen"]
+
+visibility/opacity = 0.0
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 4.0
+margin/top = 272.0
+margin/right = 1275.0
+margin/bottom = 402.0
+custom_fonts/font = ExtResource( 5 )
+custom_colors/font_color = Color( 0.333333, 0.639216, 0, 1 )
+text = "Game Over"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="Label 2" type="Label" parent="GameOverScreen"]
+
+visibility/visible = false
+rect/scale = Vector2( 0.3, 0.3 )
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 5.0
+margin/top = 422.0
+margin/right = 4238.0
+margin/bottom = 552.0
+custom_fonts/font = ExtResource( 5 )
+custom_colors/font_color = Color( 0.333333, 0.639216, 0, 1 )
+text = "TOQUE PARA JOGAR NOVAMENTE"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="GameOverScreen"]
+
+playback/process_mode = 1
+playback/default_blend_time = 0.0
+root/root = NodePath("..")
+anims/gameover = SubResource( 2 )
+playback/active = true
+playback/speed = 1.0
+blend_times = [  ]
+autoplay = ""
+
+[node name="Timer" type="Timer" parent="GameOverScreen"]
+
+process_mode = 1
+wait_time = 2.0
+one_shot = false
+autostart = false
+
 [connection signal="timeout" from="Generator" to="." method="_on_Generator_timeout"]
 
 [connection signal="timeout" from="InputProc/Inter" to="InputProc" method="_on_Inter_timeout"]
 
 [connection signal="timeout" from="InputProc/Limit" to="InputProc" method="_on_Limit_timeout"]
+
+[connection signal="timeout" from="GameOverScreen/Timer" to="GameOverScreen" method="_on_Timer_timeout"]
 
 

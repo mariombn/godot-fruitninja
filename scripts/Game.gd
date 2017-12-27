@@ -46,7 +46,7 @@ func dec_life():
 	if lifes == 0:
 		get_node("InputProc").acabou = true
 		get_node("Control/Bomb1").set_modulate(Color(1, 0, 0))
-		print("Game Over")
+		get_node("GameOverScreen").start()
 
 func inc_score():
 	if lifes <= 0: return
